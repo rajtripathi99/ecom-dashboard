@@ -10,7 +10,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 export default function Page() {
     const { setTheme } = useTheme()
     return (
-        <nav className="flex items-center justify-between border-b">
+        <nav className="flex items-center justify-between border-b sticky top-0 z-10 bg-background">
             {/* Left */}
             <div className="flex items-center p-4 gap-4">
                 <SidebarTrigger />

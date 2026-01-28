@@ -1,5 +1,17 @@
-export default function Page() {
+import { RevenueChart } from "@/components/dashboard/RevenueChart"
+import StatsCards from "@/components/dashboard/StatsCards"
+import TopProducts from "@/components/dashboard/TopProducts"
+import RecentOrders from "@/components/dashboard/RecentOrders"
+
+export default function DashboardPage() {
   return (
-    <div></div>
-  );
+    <div className="space-y-4">
+      <StatsCards />
+      <RevenueChart />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TopProducts />
+        <RecentOrders />
+      </div>
+    </div>
+  )
 }
