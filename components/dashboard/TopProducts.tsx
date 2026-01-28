@@ -38,7 +38,7 @@ const products = [
 
 export default function TopProducts() {
     return (
-        <Card className="bg-zinc-900 border-zinc-800">
+        <Card>
             <CardHeader>
                 <CardTitle>Top Products</CardTitle>
             </CardHeader>

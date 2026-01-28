@@ -56,7 +56,7 @@ import {
   
   export default function RecentOrders() {
     return (
-      <Card className="bg-zinc-900 border-zinc-800">
+      <Card>
         <CardHeader>
           <CardTitle>Recent Orders</CardTitle>
         </CardHeader>
@@ -95,4 +95,3 @@ import {
       </Card>
     )
   }
-  
