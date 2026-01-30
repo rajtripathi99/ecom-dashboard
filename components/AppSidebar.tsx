@@ -10,10 +10,17 @@ import {
     SidebarMenu,
     SidebarMenuButton,
     SidebarMenuItem,
+    useSidebar,
 } from "@/components/ui/sidebar"
 import { BarChart3, ChevronsUpDown, Command, CreditCard, FolderTree, LogOut, Megaphone, Package, Settings, ShoppingCart, User, Users, Warehouse } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import {
+    Tooltip,
+    TooltipContent,
+    TooltipProvider,
+    TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 
 const items = [
@@ -59,22 +66,64 @@ const items = [
     },
 ]
 
+function SidebarMenuItems() {
+    const { state } = useSidebar();
+    const isCollapsed = state === "collapsed";
+
+    if (!isCollapsed) {
+        return (
+            <>
+                {items.map((item) => (
+                    <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton className="py-2" asChild>
+                            <a href={item.url}>
+                                <item.icon />
+                                <span>{item.title}</span>
+                            </a>
+                        </SidebarMenuButton>
+                    </SidebarMenuItem>
+                ))}
+            </>
+        );
+    }
+
+    return (
+        <TooltipProvider delayDuration={300}>
+            {items.map((item) => (
+                <SidebarMenuItem key={item.title}>
+                    <Tooltip>
+                        <TooltipTrigger asChild>
+                            <SidebarMenuButton className="py-2" asChild>
+                                <a href={item.url}>
+                                    <item.icon />
+                                    <span>{item.title}</span>
+                                </a>
+                            </SidebarMenuButton>
+                        </TooltipTrigger>
+                        <TooltipContent side="right">
+                            <p>{item.title}</p>
+                        </TooltipContent>
+                    </Tooltip>
+                </SidebarMenuItem>
+            ))}
+        </TooltipProvider>
+    );
+}
+
 export default function AppSidebar() {
     return (
         <Sidebar variant="floating" collapsible="icon">
             <SidebarHeader>
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <a href="#">
-                                <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                                    <Command className="size-4" />
-                                </div>
-                                <div className="grid flex-1 text-left text-sm leading-tight">
-                                    <span className="truncate font-medium">Acme Inc</span>
-                                    <span className="truncate text-xs">Enterprise</span>
-                                </div>
-                            </a>
+                        <SidebarMenuButton size="lg">
+                            <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
+                                <Command className="size-4" />
+                            </div>
+                            <div className="grid flex-1 text-left text-sm leading-tight">
+                                <span className="truncate font-semibold">Acme Inc</span>
+                                <span className="truncate text-xs">Enterprise</span>
+                            </div>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 </SidebarMenu>
@@ -83,16 +132,7 @@ export default function AppSidebar() {
                 <SidebarGroupLabel>Menu</SidebarGroupLabel>
                 <SidebarGroupContent>
                     <SidebarMenu>
-                        {items.map((item) => (
-                            <SidebarMenuItem key={item.title}>
-                                <SidebarMenuButton className="py-2" asChild>
-                                    <a href={item.url}>
-                                        <item.icon />
-                                        <span>{item.title}</span>
-                                    </a>
-                                </SidebarMenuButton>
-                            </SidebarMenuItem>
-                        ))}
+                        <SidebarMenuItems />
                     </SidebarMenu>
                 </SidebarGroupContent>
             </SidebarContent>
