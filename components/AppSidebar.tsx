@@ -26,42 +26,42 @@ import {
 const items = [
     {
         title: "Products",
-        url: "#",
+        url: "/products",
         icon: Package,
     },
     {
         title: "Categories",
-        url: "#",
+        url: "/categories",
         icon: FolderTree,
     },
     {
         title: "Orders",
-        url: "#",
+        url: "/orders",
         icon: ShoppingCart,
     },
     {
         title: "Customers",
-        url: "#",
+        url: "/customers",
         icon: Users,
     },
     {
         title: "Analytics",
-        url: "#",
+        url: "/analytics",
         icon: BarChart3,
     },
     {
         title: "Inventory",
-        url: "#",
+        url: "/inventory",
         icon: Warehouse,
     },
     {
         title: "Marketing",
-        url: "#",
+        url: "/marketing",
         icon: Megaphone,
     },
     {
         title: "Settings",
-        url: "#",
+        url: "/settings",
         icon: Settings,
     },
 ]
