@@ -244,7 +244,6 @@ export function ProductsTable() {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  // Fetch products from DummyJSON API
   React.useEffect(() => {
     const fetchProducts = async () => {
       try {

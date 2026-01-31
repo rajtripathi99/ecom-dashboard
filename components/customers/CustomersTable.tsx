@@ -44,9 +44,7 @@ export type Customer = {
   totalOrders: number
 }
 
-// Helper function to generate customer data from user data
 const generateCustomerFromUser = (user: any): Customer => {
-  // Generate random number of orders between 1 and 50
   const totalOrders = Math.floor(Math.random() * 50) + 1
   
   return {
@@ -241,15 +239,12 @@ export function CustomersTable() {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  // Fetch users from DummyJSON API and convert to customers
   React.useEffect(() => {
     const fetchCustomers = async () => {
       try {
         setLoading(true)
         const response = await fetch('https://dummyjson.com/users')
         const data = await response.json()
-        
-        // Transform users into customers
         const customersData = data.users.map((user: any) => 
           generateCustomerFromUser(user)
         )

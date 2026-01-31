@@ -47,17 +47,13 @@ export type Order = {
   status: "Pending" | "Shipped" | "Delivered"
 }
 
-// Helper function to generate order data from user data
 const generateOrderFromUser = (user: any, index: number): Order => {
   const statuses: ("Pending" | "Shipped" | "Delivered")[] = ["Pending", "Shipped", "Delivered"]
   const status = statuses[index % 3]
-  
-  // Generate a random date within the last 30 days
   const daysAgo = Math.floor(Math.random() * 30)
   const orderDate = new Date()
   orderDate.setDate(orderDate.getDate() - daysAgo)
-  
-  // Generate random amount between $50 and $500
+
   const amount = Math.floor(Math.random() * 450) + 50
   
   return {
@@ -297,15 +293,13 @@ export function OrdersTable() {
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  // Fetch users from DummyJSON API and convert to orders
   React.useEffect(() => {
     const fetchOrders = async () => {
       try {
         setLoading(true)
         const response = await fetch('https://dummyjson.com/users')
         const data = await response.json()
-        
-        // Transform users into orders
+
         const ordersData = data.users.map((user: any, index: number) => 
           generateOrderFromUser(user, index)
         )
