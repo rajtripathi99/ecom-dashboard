@@ -34,19 +34,45 @@ import {
   type SortingState,
   type VisibilityState,
 } from "@tanstack/react-table"
-import { ArrowUpDown, ChevronDown, MoreHorizontal, Package } from "lucide-react"
+import { ArrowUpDown, ChevronDown, MoreHorizontal, Search, User } from "lucide-react"
 
-export type Product = {
+export type Order = {
   id: number
-  title: string
-  category: string
-  price: number
-  stock: number
-  availabilityStatus: string
-  thumbnail: string
+  orderId: string
+  customer: string
+  customerEmail: string
+  customerImage: string
+  date: string
+  amount: number
+  status: "Pending" | "Shipped" | "Delivered"
 }
 
-export const columns: ColumnDef<Product>[] = [
+// Helper function to generate order data from user data
+const generateOrderFromUser = (user: any, index: number): Order => {
+  const statuses: ("Pending" | "Shipped" | "Delivered")[] = ["Pending", "Shipped", "Delivered"]
+  const status = statuses[index % 3]
+  
+  // Generate a random date within the last 30 days
+  const daysAgo = Math.floor(Math.random() * 30)
+  const orderDate = new Date()
+  orderDate.setDate(orderDate.getDate() - daysAgo)
+  
+  // Generate random amount between $50 and $500
+  const amount = Math.floor(Math.random() * 450) + 50
+  
+  return {
+    id: user.id,
+    orderId: `ORD-${String(user.id).padStart(5, '0')}`,
+    customer: `${user.firstName} ${user.lastName}`,
+    customerEmail: user.email,
+    customerImage: user.image,
+    date: orderDate.toISOString().split('T')[0],
+    amount: amount,
+    status: status
+  }
+}
+
+export const columns: ColumnDef<Order>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -70,70 +96,93 @@ export const columns: ColumnDef<Product>[] = [
     enableHiding: false,
   },
   {
-    accessorKey: "title",
+    accessorKey: "orderId",
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          Name
+          Order ID
           <ArrowUpDown />
         </Button>
       )
     },
     cell: ({ row }) => (
+      <div className="font-medium">{row.getValue("orderId")}</div>
+    ),
+  },
+  {
+    accessorKey: "customer",
+    header: "Customer",
+    cell: ({ row }) => (
       <div className="flex items-center gap-3">
-        <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center overflow-hidden">
-          {row.original.thumbnail ? (
+        <div className="h-10 w-10 rounded-full bg-muted flex items-center justify-center overflow-hidden">
+          {row.original.customerImage ? (
             <img 
-              src={row.original.thumbnail} 
-              alt={row.getValue("title")}
+              src={row.original.customerImage} 
+              alt={row.getValue("customer")}
               className="h-full w-full object-cover"
             />
           ) : (
-            <Package className="h-5 w-5 text-muted-foreground" />
+            <User className="h-5 w-5 text-muted-foreground" />
           )}
         </div>
-        <span className="font-medium">{row.getValue("title")}</span>
+        <div className="flex flex-col">
+          <span className="font-medium">{row.getValue("customer")}</span>
+          <span className="text-sm text-muted-foreground">{row.original.customerEmail}</span>
+        </div>
       </div>
     ),
   },
   {
-    accessorKey: "category",
-    header: "Category",
-    cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("category")}</div>
-    ),
-  },
-  {
-    accessorKey: "price",
-    header: "Price",
+    accessorKey: "date",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Date
+          <ArrowUpDown />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
-      const price = row.getValue("price") as number
-      return <div>${price.toFixed(2)}</div>
+      const date = new Date(row.getValue("date"))
+      return <div>{date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</div>
     },
   },
   {
-    accessorKey: "stock",
-    header: "Stock",
+    accessorKey: "amount",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Amount
+          <ArrowUpDown />
+        </Button>
+      )
+    },
     cell: ({ row }) => {
-      const stock = row.getValue("stock") as number
-      return <div>{stock === 0 ? "—" : stock}</div>
+      const amount = row.getValue("amount") as number
+      return <div className="font-medium">${amount.toFixed(2)}</div>
     },
   },
   {
-    accessorKey: "availabilityStatus",
+    accessorKey: "status",
     header: "Status",
     cell: ({ row }) => {
-      const status = row.getValue("availabilityStatus") as string
+      const status = row.getValue("status") as string
       return (
         <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-          status === "In Stock" 
+          status === "Delivered" 
             ? "bg-green-500/10 text-green-500" 
-            : status === "Low Stock"
-            ? "bg-yellow-500/10 text-yellow-500"
-            : "bg-red-500/10 text-red-500"
+            : status === "Shipped"
+            ? "bg-blue-500/10 text-blue-500"
+            : "bg-yellow-500/10 text-yellow-500"
         }`}>
           {status}
         </span>
@@ -144,7 +193,7 @@ export const columns: ColumnDef<Product>[] = [
     id: "actions",
     enableHiding: false,
     cell: ({ row }) => {
-      const product = row.original
+      const order = row.original
 
       return (
         <DropdownMenu>
@@ -158,15 +207,16 @@ export const columns: ColumnDef<Product>[] = [
             <DropdownMenuGroup>
               <DropdownMenuLabel>Actions</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(product.id.toString())}
+                onClick={() => navigator.clipboard.writeText(order.orderId)}
               >
-                Copy product ID
+                Copy order ID
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuGroup>
-              <DropdownMenuItem>Edit product</DropdownMenuItem>
               <DropdownMenuItem>View details</DropdownMenuItem>
-              <DropdownMenuItem className="text-red-500">Delete product</DropdownMenuItem>
+              <DropdownMenuItem>Download invoice</DropdownMenuItem>
+              <DropdownMenuItem>Contact customer</DropdownMenuItem>
+              <DropdownMenuItem className="text-red-500">Cancel order</DropdownMenuItem>
             </DropdownMenuGroup>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -187,10 +237,10 @@ function SkeletonTable() {
           <TableHeader>
             <TableRow>
               <TableHead><Skeleton className="h-4 w-4" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-32" /></TableHead>
+              <TableHead><Skeleton className="h-4 w-24" /></TableHead>
+              <TableHead><Skeleton className="h-4 w-40" /></TableHead>
               <TableHead><Skeleton className="h-4 w-20" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-16" /></TableHead>
-              <TableHead><Skeleton className="h-4 w-16" /></TableHead>
+              <TableHead><Skeleton className="h-4 w-20" /></TableHead>
               <TableHead><Skeleton className="h-4 w-20" /></TableHead>
               <TableHead><Skeleton className="h-4 w-10" /></TableHead>
             </TableRow>
@@ -202,19 +252,22 @@ function SkeletonTable() {
                   <Skeleton className="h-4 w-4" />
                 </TableCell>
                 <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
                   <div className="flex items-center gap-3">
-                    <Skeleton className="h-10 w-10 rounded-lg" />
-                    <Skeleton className="h-4 w-40" />
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="flex flex-col gap-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-40" />
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+                <TableCell>
                   <Skeleton className="h-4 w-20" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-16" />
-                </TableCell>
-                <TableCell>
-                  <Skeleton className="h-4 w-12" />
                 </TableCell>
                 <TableCell>
                   <Skeleton className="h-6 w-20 rounded-full" />
@@ -236,34 +289,40 @@ function SkeletonTable() {
   )
 }
 
-export function ProductsTable() {
-  const [products, setProducts] = React.useState<Product[]>([])
+export function OrdersTable() {
+  const [orders, setOrders] = React.useState<Order[]>([])
   const [loading, setLoading] = React.useState(true)
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = React.useState({})
 
-  // Fetch products from DummyJSON API
+  // Fetch users from DummyJSON API and convert to orders
   React.useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchOrders = async () => {
       try {
         setLoading(true)
-        const response = await fetch('https://dummyjson.com/products')
+        const response = await fetch('https://dummyjson.com/users')
         const data = await response.json()
-        setProducts(data.products)
+        
+        // Transform users into orders
+        const ordersData = data.users.map((user: any, index: number) => 
+          generateOrderFromUser(user, index)
+        )
+        
+        setOrders(ordersData)
       } catch (error) {
-        console.error('Error fetching products:', error)
+        console.error('Error fetching orders:', error)
       } finally {
         setLoading(false)
       }
     }
 
-    fetchProducts()
+    fetchOrders()
   }, [])
 
   const table = useReactTable({
-    data: products,
+    data: orders,
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -288,14 +347,17 @@ export function ProductsTable() {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <Input
-          placeholder="Search products"
-          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("title")?.setFilterValue(event.target.value)
-          }
-          className="max-w-sm"
-        />
+        <div className="relative max-w-sm">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            placeholder="Search orders..."
+            value={(table.getColumn("customer")?.getFilterValue() as string) ?? ""}
+            onChange={(event) =>
+              table.getColumn("customer")?.setFilterValue(event.target.value)
+            }
+            className="pl-9"
+          />
+        </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="ml-auto">
