@@ -17,7 +17,7 @@ import {
   const orders = [
     {
       id: "#1024",
-      customer: "Raj Tripathi",
+      customer: "John Doe",
       amount: "$320",
       status: "Shipped",
     },

@@ -1,5 +1,6 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import {
   Card,
@@ -36,6 +37,13 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function SalesPieChart() {
+  const [mounted, setMounted] = useState(false)
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  if (!mounted) return null
   return (
     <Card>
       <CardHeader className="pb-4">
@@ -77,9 +85,9 @@ export function SalesPieChart() {
               cursor={false}
               content={<ChartTooltipContent hideLabel />}
             />
-            <Bar 
-              dataKey="revenue" 
-              radius={[8, 8, 0, 0]} 
+            <Bar
+              dataKey="revenue"
+              radius={[8, 8, 0, 0]}
               maxBarSize={80}
             />
           </BarChart>
