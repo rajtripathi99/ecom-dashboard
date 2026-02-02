@@ -14,9 +14,6 @@ export default function Inventory() {
                 {/* Right */}
                 <RestockTable />
             </div>
-            <div className="w-full">
-
-            </div>
         </div>
     );
 }
