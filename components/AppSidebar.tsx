@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import {
     Sidebar,
     SidebarContent,
@@ -12,15 +13,16 @@ import {
     SidebarMenuItem,
     useSidebar,
 } from "@/components/ui/sidebar"
-import { BarChart3, ChevronsUpDown, Command, CreditCard, FolderTree, LogOut, Megaphone, Package, Settings, ShoppingCart, User, Users, Warehouse } from "lucide-react";
+import { BarChart3, ChevronsUpDown, Command, LogOut, Megaphone, Package, Settings, ShoppingCart, Users, Warehouse, FolderTree } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "./ui/dropdown-menu";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import {
     Tooltip,
     TooltipContent,
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useAuth } from "@/hooks/useAuth";
 
 
 const items = [
@@ -76,10 +78,10 @@ function SidebarMenuItems() {
                 {items.map((item) => (
                     <SidebarMenuItem key={item.title}>
                         <SidebarMenuButton className="py-2" asChild>
-                            <a href={item.url}>
+                            <Link href={item.url}>
                                 <item.icon />
                                 <span>{item.title}</span>
-                            </a>
+                            </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
                 ))}
@@ -94,10 +96,10 @@ function SidebarMenuItems() {
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <SidebarMenuButton className="py-2" asChild>
-                                <a href={item.url}>
+                                <Link href={item.url}>
                                     <item.icon />
                                     <span>{item.title}</span>
-                                </a>
+                                </Link>
                             </SidebarMenuButton>
                         </TooltipTrigger>
                         <TooltipContent side="right">
@@ -111,6 +113,9 @@ function SidebarMenuItems() {
 }
 
 export default function AppSidebar() {
+    const { user, logout } = useAuth();
+    if (!user) return null;
+    const initials = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`;
     return (
         <Sidebar variant="floating" collapsible="icon">
             <SidebarHeader>
@@ -144,38 +149,28 @@ export default function AppSidebar() {
                                 <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                                     <div className="flex items-center gap-2 w-full">
                                         <Avatar className="h-8 w-8">
-                                            <AvatarImage src="https://github.com/shadcn.png" />
-                                            <AvatarFallback>CN</AvatarFallback>
+                                            <AvatarImage src={user.image} />
+                                            <AvatarFallback>{initials}</AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col flex-1 text-left text-sm leading-tight">
-                                            <span className="truncate font-semibold">Example User</span>
-                                            <span className="truncate text-xs text-muted-foreground">test@example.com</span>
+                                            <span className="truncate font-semibold">
+                                                {user.firstName} {user.lastName}
+                                            </span>
+                                            <span className="truncate text-xs text-muted-foreground">
+                                                {user.email}
+                                            </span>
                                         </div>
                                         <ChevronsUpDown className="ml-auto h-4 w-4" />
                                     </div>
                                 </SidebarMenuButton>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-56" side="top" align="end">
-                                <DropdownMenuGroup>
-                                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                                    <DropdownMenuSeparator />
-                                    <DropdownMenuItem>
-                                        <User className="h-4 w-4" />
-                                        <span>Profile</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <CreditCard className="h-4 w-4" />
-                                        <span>Billing</span>
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem>
-                                        <Settings className=" h-4 w-4" />
-                                        <span>Settings</span>
-                                    </DropdownMenuItem>
-                                </DropdownMenuGroup>
-                                <DropdownMenuSeparator />
-                                <DropdownMenuItem className="text-red-500">
-                                    <LogOut className="text-red-500 h-4 w-4" />
-                                    <span>LogOut</span>
+                                <DropdownMenuItem
+                                    onClick={logout}
+                                    className="text-red-600 dark:text-red-500 cursor-pointer"
+                                >
+                                    <LogOut className="text-red-600 h-4 w-4" />
+                                    <span>Log out</span>
                                 </DropdownMenuItem>
                             </DropdownMenuContent>
                         </DropdownMenu>

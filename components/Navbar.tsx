@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { SidebarTrigger } from "./ui/sidebar";
 import { useTheme } from "next-themes";
@@ -7,12 +8,12 @@ import { Button } from "./ui/button";
 import { Moon, Sun } from "lucide-react";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "./ui/dropdown-menu";
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
+    Breadcrumb,
+    BreadcrumbItem,
+    BreadcrumbLink,
+    BreadcrumbList,
+    BreadcrumbPage,
+    BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
 
 const routeTitles: Record<string, string> = {
@@ -32,7 +33,7 @@ export default function Page() {
     const pathname = usePathname()
     const title = routeTitles[pathname] || "Dashboard"
     const pathSegments = pathname.split('/').filter(segment => segment)
-    
+
     return (
         <nav className="flex items-center justify-between border-b sticky top-0 z-10 bg-background">
             {/* Left */}
@@ -41,7 +42,10 @@ export default function Page() {
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            <BreadcrumbLink href="/">Dashboard</BreadcrumbLink>
+                            {/* <BreadcrumbLink href="/">Dashboard</BreadcrumbLink> */}
+                            <BreadcrumbLink asChild>
+                                <Link href="/">Dashboard</Link>
+                            </BreadcrumbLink>
                         </BreadcrumbItem>
                         {pathSegments.length > 0 && pathname !== "/" && (
                             <>
