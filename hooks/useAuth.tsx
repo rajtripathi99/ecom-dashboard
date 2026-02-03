@@ -14,19 +14,35 @@ export interface User {
   token: string
 }
 
+// export interface AuthContextType {
+//   user: User | null
+//   loading: boolean
+//   login: (username: string, password: string) => Promise<void>
+//   logout: () => void
+//   error: string | null
+// }
+
 export interface AuthContextType {
-  user: User | null
+  user: User | null | undefined
   loading: boolean
   login: (username: string, password: string) => Promise<void>
   logout: () => void
   error: string | null
 }
 
+// const AuthContext = createContext<AuthContextType>({
+//   user: null,
+//   loading: true,
+//   login: async () => {},
+//   logout: () => {},
+//   error: null,
+// })
+
 const AuthContext = createContext<AuthContextType>({
-  user: null,
+  user: undefined,
   loading: true,
-  login: async () => {},
-  logout: () => {},
+  login: async () => { },
+  logout: () => { },
   error: null,
 })
 
@@ -35,22 +51,38 @@ interface AuthProviderProps {
 }
 
 export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null)
+  // const [user, setUser] = useState<User | null>(null)
+  const [user, setUser] = useState<User | null | undefined>(undefined)
   const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
+  // useEffect(() => {
+  //   if (typeof window !== 'undefined') {
+  //     const storedUser = localStorage.getItem('user')
+  //     if (storedUser) {
+  //       try {
+  //         setUser(JSON.parse(storedUser) as User)
+  //       } catch (e) {
+  //         console.error('Failed to parse user data:', e)
+  //         localStorage.removeItem('user')
+  //       }
+  //     }
+  //   }
+  //   setLoading(false)
+  // }, [])
+
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedUser = localStorage.getItem('user')
-      if (storedUser) {
-        try {
-          setUser(JSON.parse(storedUser) as User)
-        } catch (e) {
-          console.error('Failed to parse user data:', e)
-          localStorage.removeItem('user')
-        }
+    const storedUser = localStorage.getItem('user')
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser) as User)
+      } catch {
+        localStorage.removeItem('user')
+        setUser(null)
       }
+    } else {
+      setUser(null)
     }
     setLoading(false)
   }, [])
@@ -59,7 +91,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     try {
       setError(null)
       setLoading(true)
-      
+
       const response = await fetch('https://dummyjson.com/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -75,13 +107,13 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
       }
 
       const data = await response.json()
-      
+
       setUser(data as User)
       if (typeof window !== 'undefined') {
         localStorage.setItem('user', JSON.stringify(data))
         localStorage.setItem('token', data.token)
       }
-      
+
       router.push('/')
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Login failed')
@@ -101,7 +133,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
   }
 
   return (
-    <AuthContext.Provider 
+    <AuthContext.Provider
       value={{
         user,
         loading,
