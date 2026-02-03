@@ -9,21 +9,36 @@ import { ReactNode, useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 
 export default function ClientProviders({ children }: { children: ReactNode }) {
-  const [defaultOpen, setDefaultOpen] = useState(true)
+  const [open, setOpen] = useState<boolean | null>(null)
   const pathname = usePathname()
   const isLoginPage = pathname === '/login'
 
+  // Load persisted sidebar state
   useEffect(() => {
-    // Get sidebar state from cookies on client side
-    if (typeof window !== 'undefined') {
-      const cookies = document.cookie.split(';')
-      const sidebarCookie = cookies.find(c => c.trim().startsWith('sidebar_state='))
-      if (sidebarCookie) {
-        const value = sidebarCookie.split('=')[1]
-        setDefaultOpen(value === 'true')
-      }
-    }
+    const stored = localStorage.getItem("sidebar_open")
+    setOpen(stored ? JSON.parse(stored) : true) // default first time
   }, [])
+
+  // Persist on every change
+  useEffect(() => {
+    if (open !== null) {
+      localStorage.setItem("sidebar_open", JSON.stringify(open))
+    }
+  }, [open])
+
+  // Wait for hydration
+  if (open === null) {
+    return (
+      <AuthProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <div className="min-h-screen flex">
+            <div className="w-64 border-r bg-muted animate-pulse" />
+            <div className="flex-1" />
+          </div>
+        </ThemeProvider>
+      </AuthProvider>
+    )
+  }
 
   return (
     <AuthProvider>
@@ -34,11 +49,9 @@ export default function ClientProviders({ children }: { children: ReactNode }) {
         disableTransitionOnChange
       >
         {isLoginPage ? (
-          // Login page - no sidebar or navbar
           children
         ) : (
-          // Protected pages - with sidebar and navbar
-          <SidebarProvider defaultOpen={defaultOpen}>
+          <SidebarProvider open={open} onOpenChange={setOpen}>
             <AppSidebar />
             <main className="w-full">
               <Navbar />
