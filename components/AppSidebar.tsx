@@ -114,7 +114,9 @@ function SidebarMenuItems() {
 
 export default function AppSidebar() {
     const { user, logout } = useAuth();
-    if (!user) return null;
+    // if (!user) return null;
+    if (user === undefined) return null // still loading
+    if (!user) return null // actually logged out
     const initials = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`;
     return (
         <Sidebar variant="floating" collapsible="icon">
