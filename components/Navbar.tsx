@@ -28,7 +28,7 @@ const routeTitles: Record<string, string> = {
     "/settings": "Settings",
 }
 
-export default function Page() {
+export default function Navbar() {
     const { setTheme } = useTheme()
     const pathname = usePathname()
     const title = routeTitles[pathname] || "Dashboard"
@@ -42,7 +42,6 @@ export default function Page() {
                 <Breadcrumb>
                     <BreadcrumbList>
                         <BreadcrumbItem>
-                            {/* <BreadcrumbLink href="/">Dashboard</BreadcrumbLink> */}
                             <BreadcrumbLink asChild>
                                 <Link href="/">Dashboard</Link>
                             </BreadcrumbLink>
@@ -62,7 +61,7 @@ export default function Page() {
             <div className="p-4">
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                        <Button variant="outline" size="icon">
+                        <Button variant="outline" size="icon" suppressHydrationWarning>
                             <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
                             <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
                             <span className="sr-only">Toggle theme</span>

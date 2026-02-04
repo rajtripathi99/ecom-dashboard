@@ -113,6 +113,7 @@ function SidebarMenuItems() {
 }
 
 export default function AppSidebar() {
+
     const { user, logout } = useAuth();
     // if (!user) return null;
     if (user === undefined) return null // still loading

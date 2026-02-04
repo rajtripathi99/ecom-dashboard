@@ -87,41 +87,35 @@ export const AuthProvider: FC<AuthProviderProps> = ({ children }) => {
     setLoading(false)
   }, [])
 
-  const login = async (username: string, password: string): Promise<void> => {
-    try {
-      setError(null)
-      setLoading(true)
+const login = async (username: string, password: string): Promise<void> => {
+  try {
+    setError(null)
+    setLoading(true)
 
-      const response = await fetch('https://dummyjson.com/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username,
-          password,
-          expiresInMins: 30,
-        })
-      })
+    const response = await fetch('https://dummyjson.com/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    })
 
-      if (!response.ok) {
-        throw new Error('Invalid credentials')
-      }
-
-      const data = await response.json()
-
-      setUser(data as User)
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('user', JSON.stringify(data))
-        localStorage.setItem('token', data.token)
-      }
-
-      router.push('/')
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
-      throw err
-    } finally {
-      setLoading(false)
+    if (!response.ok) {
+      throw new Error('Invalid credentials')
     }
+
+    const data = await response.json()
+
+    setUser(data as User)
+    localStorage.setItem('user', JSON.stringify(data))
+    localStorage.setItem('token', data.accessToken) // use correct key
+
+    setLoading(false)
+    router.push('/')
+  } catch (err) {
+    setError(err instanceof Error ? err.message : 'Login failed')
+    setLoading(false)
+    // ❌ DO NOT throw
   }
+}
 
   const logout = (): void => {
     setUser(null)

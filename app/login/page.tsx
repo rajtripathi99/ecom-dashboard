@@ -19,7 +19,7 @@ export default function LoginPage() {
     try {
       await login(username, password)
     } catch (err) {
-        //error handled in useAuth.ts
+        //error handled in useAuth
     }
   }
 
