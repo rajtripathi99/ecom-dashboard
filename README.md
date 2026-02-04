@@ -66,7 +66,7 @@ A modern, feature-rich e-commerce dashboard built with Next.js 16, React 19, and
 - **Dark/Light Mode**: Theme switching with `next-themes`
 - **Responsive Design**: Mobile-first approach, works on all devices
 - **Collapsible Sidebar**: Space-efficient navigation with tooltips
-- **Modern Components**: Built with Radix UI primitives
+- **Modern Components**: Built with shadcn/ui
 - **Smooth Animations**: Enhanced user experience
 - **Data Tables**: Powered by TanStack Table
 
@@ -80,7 +80,7 @@ A modern, feature-rich e-commerce dashboard built with Next.js 16, React 19, and
 - **Icons**: [Lucide React](https://lucide.dev/)
 
 ### **UI Components**
-- **Component Library**: Custom components built on [Radix UI](https://www.radix-ui.com/)
+- **Component Library**: [shadcn/ui](https://ui.shadcn.com/)
 - **Data Tables**: [@tanstack/react-table](https://tanstack.com/table/latest)
 - **Charts**: [Recharts](https://recharts.org/)
 - **Animations**: tw-animate-css
