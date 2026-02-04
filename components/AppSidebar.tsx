@@ -113,12 +113,23 @@ function SidebarMenuItems() {
 }
 
 export default function AppSidebar() {
-
     const { user, logout } = useAuth();
-    // if (!user) return null;
-    if (user === undefined) return null // still loading
-    if (!user) return null // actually logged out
-    const initials = `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}`;
+    
+    console.log("AppSidebar rendering, user:", user); // Add this for debugging
+    
+    // Temporarily comment out to see if sidebar renders
+    // if (user === undefined) return null
+    // if (!user) return null
+    
+    // Handle null user case
+    const initials = user?.firstName?.[0] || user?.lastName?.[0] 
+        ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` 
+        : 'U';
+    
+    const userName = user ? `${user.firstName} ${user.lastName}` : 'Guest User';
+    const userEmail = user?.email || 'guest@example.com';
+    const userImage = user?.image || '';
+
     return (
         <Sidebar variant="floating" collapsible="icon">
             <SidebarHeader>
@@ -152,15 +163,15 @@ export default function AppSidebar() {
                                 <SidebarMenuButton size="lg" className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
                                     <div className="flex items-center gap-2 w-full">
                                         <Avatar className="h-8 w-8">
-                                            <AvatarImage src={user.image} />
+                                            <AvatarImage src={userImage} />
                                             <AvatarFallback>{initials}</AvatarFallback>
                                         </Avatar>
                                         <div className="flex flex-col flex-1 text-left text-sm leading-tight">
                                             <span className="truncate font-semibold">
-                                                {user.firstName} {user.lastName}
+                                                {userName}
                                             </span>
                                             <span className="truncate text-xs text-muted-foreground">
-                                                {user.email}
+                                                {userEmail}
                                             </span>
                                         </div>
                                         <ChevronsUpDown className="ml-auto h-4 w-4" />
@@ -180,6 +191,6 @@ export default function AppSidebar() {
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarFooter>
-        </Sidebar >
+        </Sidebar>
     );
 }
