@@ -4,12 +4,16 @@ import { SidebarProvider } from "@/components/ui/sidebar"
 import AppSidebar from "@/components/AppSidebar"
 import Navbar from "@/components/Navbar"
 import { useEffect, useState } from "react"
+import { useAuth } from "@/hooks/useAuth"
+import { useRouter } from "next/navigation"
 
 export default function DashboardLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
+    const { user } = useAuth()
+    const router = useRouter()
     const [defaultOpen, setDefaultOpen] = useState(true)
     const [mounted, setMounted] = useState(false)
 
@@ -26,8 +30,24 @@ export default function DashboardLayout({
         }
     }, [])
 
-    // Prevent hydration mismatch
-    if (!mounted) {
+    // Redirect to login if not authenticated
+    useEffect(() => {
+        if (mounted && user === null) {
+            router.push('/login') // or whatever your login route is
+        }
+    }, [user, mounted, router])
+
+    // Show loading state while checking auth
+    if (!mounted || user === undefined) {
+        return (
+            <div className="flex h-screen items-center justify-center">
+                <div className="text-muted-foreground">Loading...</div>
+            </div>
+        )
+    }
+
+    // Don't render dashboard if no user
+    if (!user) {
         return null
     }
 
