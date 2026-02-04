@@ -115,12 +115,6 @@ function SidebarMenuItems() {
 export default function AppSidebar() {
     const { user, logout } = useAuth();
     
-    console.log("AppSidebar rendering, user:", user); // Add this for debugging
-    
-    // Temporarily comment out to see if sidebar renders
-    // if (user === undefined) return null
-    // if (!user) return null
-    
     // Handle null user case
     const initials = user?.firstName?.[0] || user?.lastName?.[0] 
         ? `${user.firstName?.[0] || ''}${user.lastName?.[0] || ''}` 
